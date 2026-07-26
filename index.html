@@ -54,10 +54,15 @@
   .card p{ color:var(--muted); font-size:13px; line-height:1.6; margin:0; }
   section.block{ padding:20px 0 50px; }
   h2.title{ font-family:'Fraunces',serif; font-size:28px; margin:0 0 20px; word-wrap:break-word; overflow-wrap:break-word; max-width:100%; padding-left:2px; }
-  .tabs{ display:inline-flex; gap:4px; background:var(--panel); padding:4px; border-radius:14px; margin-bottom:20px; }
-  .tab-btn{ border:none; cursor:pointer; background:transparent; color:var(--muted); font-family:inherit; font-size:13px; font-weight:600; padding:9px 16px; border-radius:10px; }
-  .tab-btn.active{ background:var(--gold); color:#0E1526; }
-  .atelier-box{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px; }
+  .menu-grid{ display:flex; flex-direction:column; gap:14px; }
+  .menu-card{ display:flex; align-items:center; gap:16px; width:100%; text-align:left; background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:20px; cursor:pointer; font-family:inherit; transition:border-color .15s, transform .1s; }
+  .menu-card:active{ transform:scale(0.98); }
+  .menu-card:hover{ border-color:var(--gold); }
+  .menu-icon{ font-size:24px; width:50px; height:50px; flex-shrink:0; border-radius:12px; background:var(--panel2); display:flex; align-items:center; justify-content:center; }
+  .menu-text{ flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .menu-text strong{ font-family:'Fraunces',serif; font-size:17px; color:var(--cream); font-weight:600; }
+  .menu-text small{ color:var(--muted); font-size:12.5px; line-height:1.5; }
+  .menu-arrow{ color:var(--gold); font-size:18px; flex-shrink:0; }
   select,input[type=text],input[type=tel],textarea{ font-family:inherit; background:var(--panel2); color:var(--cream); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:14px; outline:none; }
   textarea{ width:100%; resize:none; }
   .field-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:16px; }
@@ -116,16 +121,15 @@
   .reader-btn.active{ background:#E3A947; border-color:#E3A947; color:#2A2116; font-weight:600; }
   .reader-translation{ margin-top:20px; padding:16px 18px; background:#FBF7EC; border:1px solid #DFD5BE; border-radius:12px; font-size:14px; line-height:1.7; white-space:pre-wrap; display:none; }
   .reader-loading{ text-align:center; padding:60px 0; color:#8A7B54; }
+  .reader-overlay select, .reader-overlay input[type=text], .reader-overlay textarea{ background:#fff; color:#2A2116; border:1px solid #C9BB93; }
+  .reader-overlay .usage{ color:#8A7B54; }
 
-  /* ---- Espace de conversation plein écran ---- */
-  .chat-overlay{ position:fixed; inset:0; z-index:120; background:linear-gradient(180deg,#0B1120,#131B32); display:none; flex-direction:column; }
-  .chat-overlay.open{ display:flex; }
-  .chat-top{ padding:14px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); }
-  .chat-top .close-reader{ background:none; border:none; font-size:20px; cursor:pointer; color:var(--cream); }
+  /* ---- Espace de conversation plein écran (même esthétique papier que la Lecture) ---- */
   .chat-body{ flex:1; overflow-y:auto; padding:20px; max-width:640px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:12px; }
-  .chat-foot{ padding:14px 20px; border-top:1px solid var(--line); }
+  .chat-foot{ padding:14px 20px; border-top:1px solid #DFD5BE; }
   .chat-foot-inner{ max-width:640px; margin:0 auto; display:flex; gap:8px; }
   .chat-foot-inner input{ flex:1; }
+  .msg.bot{ background:#EFE8D8; color:#2A2116; }
 
   /* ---- Espace atelier plein écran ---- */
   .atelier-overlay{ position:fixed; inset:0; z-index:110; background:var(--bg); display:none; overflow-y:auto; }
@@ -174,40 +178,24 @@
     <button class="close-reader" onclick="closeAtelierOverlay()">✕</button>
   </div>
   <div class="atelier-inner">
-  <div class="tabs">
-    <button class="tab-btn active" id="tabBtn-lecture" onclick="switchTab('lecture')">📖 Lecture</button>
-    <button class="tab-btn" id="tabBtn-correction" onclick="switchTab('correction')">✔️ Correction</button>
-    <button class="tab-btn" id="tabBtn-chat" onclick="openChatOverlay()">💬 Conversation</button>
-  </div>
-
-  <div class="atelier-box">
-    <!-- LECTURE -->
-    <div id="panel-lecture">
-      <div class="field-row">
-        <label class="mono" style="font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px;">
-          Niveau
-          <select id="levelSelect">
-            <option>Débutant</option>
-            <option selected>Intermédiaire</option>
-            <option>Professionnel</option>
-          </select>
-        </label>
-        <input type="text" id="topicInput" placeholder="Thème (optionnel) — ex: voyages, technologie..." />
-        <button class="btn btn-gold" onclick="generateText()">✨ Générer un texte</button>
-        <span class="usage" id="usage-lecture">Essai gratuit 3 jours</span>
-      </div>
+    <p class="muted" style="margin:0 0 22px; font-size:14px;">Choisis une activité pour commencer à pratiquer.</p>
+    <div class="menu-grid">
+      <button class="menu-card" onclick="openLectureSetup()">
+        <span class="menu-icon">📖</span>
+        <span class="menu-text"><strong>Lecture</strong><small>Des textes générés selon ton niveau, avec audio et traduction.</small></span>
+        <span class="menu-arrow">→</span>
+      </button>
+      <button class="menu-card" onclick="openCorrectionOverlay()">
+        <span class="menu-icon">✔️</span>
+        <span class="menu-text"><strong>Correction</strong><small>Écris une phrase : l'IA corrige et explique tes erreurs.</small></span>
+        <span class="menu-arrow">→</span>
+      </button>
+      <button class="menu-card" onclick="openChatOverlay()">
+        <span class="menu-icon">💬</span>
+        <span class="menu-text"><strong>Conversation</strong><small>Discute librement en anglais, à l'écrit ou à voix haute.</small></span>
+        <span class="menu-arrow">→</span>
+      </button>
     </div>
-
-    <!-- CORRECTION -->
-    <div id="panel-correction" style="display:none;">
-      <textarea id="correctionInput" rows="6" placeholder="Écris une phrase ou un paragraphe en anglais ici..."></textarea>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin:12px 0;">
-        <span class="usage" id="usage-correction">Essai gratuit 3 jours</span>
-        <button class="btn btn-gold" onclick="correctText()">✔️ Corriger</button>
-      </div>
-      <div class="output" id="output-correction"><span class="muted">La correction et les explications s'affichent ici.</span></div>
-    </div>
-  </div>
   </div>
 </div>
 
@@ -281,12 +269,29 @@
   </div>
 </div>
 
+<!-- ESPACE DE CORRECTION PLEIN ÉCRAN -->
+<div class="reader-overlay" id="correctionOverlay">
+  <div class="reader-top">
+    <span class="display" style="font-size:18px;">✔️ Correction</span>
+    <button class="close-reader" onclick="closeCorrectionOverlay()">✕</button>
+  </div>
+  <div class="reader-body">
+    <span class="lvl">Écris une phrase ou un paragraphe en anglais</span>
+    <textarea id="correctionInput" rows="6" placeholder="Écris ici..." style="width:100%; margin-top:14px; font-family:'Sora',sans-serif;"></textarea>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:14px 0;">
+      <span class="usage" id="usage-correction">Essai gratuit 3 jours</span>
+      <button class="btn btn-gold" onclick="correctText()">✔️ Corriger</button>
+    </div>
+    <div class="reader-translation" id="output-correction" style="display:block;"><span style="color:#8A7B54;">La correction et les explications s'affichent ici.</span></div>
+  </div>
+</div>
+
 <!-- ESPACE DE CONVERSATION PLEIN ÉCRAN -->
-<div class="chat-overlay" id="chatOverlay">
-  <div class="chat-top">
-    <span class="display" style="font-size:18px; color:var(--cream);">💬 Conversation</span>
+<div class="reader-overlay" id="chatOverlay">
+  <div class="reader-top">
+    <span class="display" style="font-size:18px;">💬 Conversation</span>
     <span class="usage" id="usage-chat-overlay" style="margin-left:auto; margin-right:14px;">Essai gratuit 3 jours</span>
-    <button class="reader-btn" id="voiceToggleBtn" onclick="toggleVoiceReplies()" style="margin-right:8px; background:transparent; color:var(--cream); border-color:var(--line);">🔊 Réponses audio</button>
+    <button class="reader-btn" id="voiceToggleBtn" onclick="toggleVoiceReplies()" style="margin-right:8px;">🔊 Réponses audio</button>
     <button class="close-reader" onclick="closeChatOverlay()">✕</button>
   </div>
   <div class="chat-body" id="chatOverlayBody"></div>
@@ -352,11 +357,29 @@
     document.getElementById('atelierOverlay').classList.remove('open');
   }
 
-  function switchTab(tab){
-    ['lecture','correction'].forEach(t=>{
-      document.getElementById('panel-'+t).style.display = (t===tab)?'block':'none';
-      document.getElementById('tabBtn-'+t).classList.toggle('active', t===tab);
-    });
+  function openLectureSetup(){
+    openReader();
+    document.getElementById('readerBody').innerHTML = `
+      <span class="lvl">Choisis ton niveau</span>
+      <div style="display:flex; flex-direction:column; gap:14px; margin-top:14px; max-width:420px;">
+        <select id="levelSelect">
+          <option>Débutant</option>
+          <option selected>Intermédiaire</option>
+          <option>Professionnel</option>
+        </select>
+        <input type="text" id="topicInput" placeholder="Thème (optionnel) — ex: voyages, technologie..." />
+        <button class="btn btn-gold" onclick="generateText()" style="align-self:flex-start;">✨ Générer un texte</button>
+        <span class="usage" id="usage-lecture">Essai gratuit 3 jours</span>
+      </div>
+    `;
+    updateUsageLabels();
+  }
+  function openCorrectionOverlay(){
+    document.getElementById('correctionOverlay').classList.add('open');
+    updateUsageLabels();
+  }
+  function closeCorrectionOverlay(){
+    document.getElementById('correctionOverlay').classList.remove('open');
   }
 
   // ---------- gating (basé sur le statut renvoyé par le serveur) ----------
@@ -518,7 +541,7 @@
     if(!input.trim()) return;
     if(!gate('correction')) return;
     const out = document.getElementById('output-correction');
-    out.innerHTML = '<span class="muted">Correction en cours...</span>';
+    out.innerHTML = '<span style="color:#8A7B54;">Correction en cours...</span>';
     try{
       const sys = "Tu es un correcteur d'anglais pour un apprenant francophone. On te donne un texte en anglais possiblement fautif. Réponds en 3 parties claires : 1) 'Version corrigée :' suivi du texte corrigé. 2) 'Corrections :' liste courte des erreurs expliquées brièvement en français. 3) 'Remarque :' un conseil bref. Sois concis.";
       const text = await askClaude([{role:'user', content: input}], sys);
