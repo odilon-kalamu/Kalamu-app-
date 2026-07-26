@@ -60,8 +60,8 @@
   .menu-card:hover{ border-color:var(--gold); }
   .menu-icon{ font-size:24px; width:50px; height:50px; flex-shrink:0; border-radius:12px; background:var(--panel2); display:flex; align-items:center; justify-content:center; }
   .menu-text{ flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; }
-  .menu-text strong{ font-family:'Fraunces',serif; font-size:17px; color:var(--cream); font-weight:600; }
-  .menu-text small{ color:var(--muted); font-size:12.5px; line-height:1.5; }
+  .menu-text strong{ font-family:'Fraunces',serif; font-size:20px; color:var(--cream); font-weight:600; }
+  .menu-text small{ color:var(--muted); font-size:14.5px; line-height:1.55; }
   .menu-arrow{ color:var(--gold); font-size:18px; flex-shrink:0; }
   select,input[type=text],input[type=tel],textarea{ font-family:inherit; background:var(--panel2); color:var(--cream); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:14px; outline:none; }
   textarea{ width:100%; resize:none; }
@@ -178,7 +178,7 @@
     <button class="close-reader" onclick="closeAtelierOverlay()">✕</button>
   </div>
   <div class="atelier-inner">
-    <p class="muted" style="margin:0 0 22px; font-size:14px;">Choisis une activité pour commencer à pratiquer.</p>
+    <p class="muted" style="margin:0 0 22px; font-size:15.5px;">Choisis une activité pour commencer à pratiquer.</p>
     <div class="menu-grid">
       <button class="menu-card" onclick="openLectureSetup()">
         <span class="menu-icon">📖</span>
@@ -432,15 +432,13 @@
     // au cas où on voudrait les réafficher ailleurs plus tard.
   }
 
-  // ---------- Claude API ----------
+  // ---------- Claude API (via le serveur Kalamu, qui garde la clé en sécurité) ----------
   async function askClaude(messages, system){
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const data = await apiCall("/api/ai", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1000, system, messages })
+      body: JSON.stringify({ messages, system })
     });
-    const data = await res.json();
-    return (data.content || []).map(b => b.type === 'text' ? b.text : '').filter(Boolean).join('\n');
+    return data.text || "";
   }
 
   // ---------- lecture ----------
