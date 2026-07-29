@@ -458,7 +458,7 @@
       renderReaderContent(level, text, topic);
       consume('lecture');
     }catch(e){
-      document.getElementById('readerBody').innerHTML = '<div class="reader-loading">Une erreur est survenue. Réessaie.</div>';
+      document.getElementById('readerBody').innerHTML = '<div class="reader-loading">Erreur : ' + (e.message || 'inconnue') + '</div>';
     }
   }
 
